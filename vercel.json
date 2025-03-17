@@ -1,9 +1,6 @@
 {
   "functions": {
-    "api/*.js": {
-      "maxDuration": 60
-    },
-    "api/*.ts": {
+    "app/api/generate-matchcards/route.ts": {
       "maxDuration": 60
     }
   }
