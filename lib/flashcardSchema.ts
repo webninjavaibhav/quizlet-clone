@@ -27,4 +27,4 @@ export type Flashcard = z.infer<typeof flashcardSchema>;
 export type FillInBlankCard = z.infer<typeof fillInBlankSchema>;
 export type QACard = z.infer<typeof qaSchema>;
 
-export const flashcardsSchema = z.array(flashcardSchema).length(12); 
+export const flashcardsSchema = z.array(flashcardSchema).length(8); 

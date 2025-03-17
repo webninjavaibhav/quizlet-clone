@@ -17,4 +17,4 @@ export const questionSchema = z.object({
 
 export type Question = z.infer<typeof questionSchema>;
 
-export const questionsSchema = z.array(questionSchema).length(12);
+export const questionsSchema = z.array(questionSchema).length(8);

@@ -55,7 +55,7 @@ export default function ChatWithFiles() {
     },
     onFinish: ({ object }) => {
       console.log(object)
-      if (object && object.length === 12) {
+      if (object && object.length === 8) {
         setQuestions(object);
       } else {
         toast.error("Failed to generate all quiz questions");
@@ -162,23 +162,15 @@ export default function ChatWithFiles() {
     );
     
     try {
-      // Generate title first
       const generatedTitle = await generateQuizTitle(encodedFiles[0].name);
       setTitle(generatedTitle);
 
-      // Submit based on selected mode
-      if (studyMode === "quiz") {
-        await submitQuiz({ files: encodedFiles });
-      } else if (studyMode === "flashcards") {
-        await submitFlashcards({ files: encodedFiles });
-      } else {
-        await submitMatchCards({ files: encodedFiles });
-      }
-
-      // Submit others in background
-      if (studyMode !== "quiz") submitQuiz({ files: encodedFiles });
-      if (studyMode !== "flashcards") submitFlashcards({ files: encodedFiles });
-      if (studyMode !== "matching") submitMatchCards({ files: encodedFiles });
+      // Call all APIs simultaneously
+      await Promise.all([
+        submitQuiz({ files: encodedFiles }),
+        submitFlashcards({ files: encodedFiles }),
+        submitMatchCards({ files: encodedFiles })
+      ]);
 
     } catch (error) {
       console.error("Error generating content:", error);
@@ -206,18 +198,16 @@ export default function ChatWithFiles() {
     setIsMatchingComplete(false);
   };
 
-  // Loading and progress states
-  const isLoading = (studyMode === "quiz" && isLoadingQuiz) || 
-                   (studyMode === "flashcards" && isLoadingFlashcards) ||
-                   (studyMode === "matching" && isLoadingMatchCards);
-  
+  // Loading state based on selected mode
+  const isLoading = isLoadingQuiz || isLoadingFlashcards || isLoadingMatchCards;
+
   // Calculate progress for selected mode
   const getModeProgress = () => {
     switch(studyMode) {
       case "quiz":
-        return partialQuestions ? (partialQuestions.length / 12) * 100 : 0;
+        return partialQuestions ? (partialQuestions.length / 8) * 100 : 0;
       case "flashcards":
-        return partialFlashcards ? (partialFlashcards.length / 12) * 100 : 0;
+        return partialFlashcards ? (partialFlashcards.length / 8) * 100 : 0;
       case "matching":
         return partialMatchCards ? (partialMatchCards.length / 6) * 100 : 0;
       default:
@@ -229,9 +219,9 @@ export default function ChatWithFiles() {
 
   // Content state checks based on selected mode
   const hasContent = files.length > 0 && (
-    (studyMode === "quiz" && questions.length === 12) ||
-    (studyMode === "flashcards" && flashcards.length === 12) ||
-    (studyMode === "matching" && matchCards.length === 6)
+    (studyMode === "quiz" && questions.length === 8 && !isLoadingQuiz) ||
+    (studyMode === "flashcards" && flashcards.length === 8 && !isLoadingFlashcards) ||
+    (studyMode === "matching" && matchCards.length === 6 && !isLoadingMatchCards)
   );
 
   // Render content based on state
@@ -241,22 +231,24 @@ export default function ChatWithFiles() {
         <Header 
           mode={studyMode} 
           setMode={setStudyMode}
-          questionCount={studyMode === "quiz" ? 12 : studyMode === "flashcards" ? 12 : 6}
+          questionCount={studyMode === "quiz" ? 8 : studyMode === "flashcards" ? 8 : 6}
           onReset={resetAll}
           answeredCount={studyMode === "quiz" ? quizAnswers.filter(answer => answer !== null).length : 0}
           onModeChange={handleModeChange}
           matchingComplete={isMatchingComplete}
         />
-        {studyMode === "quiz" ? (
+        {studyMode === "quiz" && questions.length === 8 && (
           <Quiz 
             title={title ?? "Quiz"} 
             questions={questions} 
             clearPDF={clearPDF}
             onAnswerSelect={(answers) => setQuizAnswers(answers)}
           />
-        ) : studyMode === "flashcards" ? (
+        )}
+        {studyMode === "flashcards" && flashcards.length === 8 && (
           <Flashcards title={title ?? "Flashcards"} flashcards={flashcards} clearPDF={clearPDF} />
-        ) : (
+        )}
+        {studyMode === "matching" && matchCards.length === 6 && (
           <MatchCards 
             title={title ?? "Matching Game"} 
             matchCards={matchCards} 
@@ -382,10 +374,10 @@ export default function ChatWithFiles() {
               {isLoading ? (
                 <span className="flex items-center space-x-2">
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>Generating {studyMode}...</span>
+                  <span>Generating all study materials...</span>
                 </span>
               ) : (
-                `Generate ${studyMode}`
+                "Generate all study materials"
               )}
             </Button>
           </form>
@@ -405,11 +397,11 @@ export default function ChatWithFiles() {
                 <span className="text-muted-foreground text-center col-span-4 sm:col-span-2">
                   {studyMode === "quiz" ? (
                     partialQuestions
-                      ? `Generating question ${partialQuestions.length + 1} of 12`
+                      ? `Generating question ${partialQuestions.length + 1} of 8`
                       : "Analyzing PDF content"
                   ) : studyMode === "flashcards" ? (
                     partialFlashcards
-                      ? `Generating flashcard ${partialFlashcards.length + 1} of 12`
+                      ? `Generating flashcard ${partialFlashcards.length + 1} of 8`
                       : "Analyzing PDF content"
                   ) : (
                     partialMatchCards
