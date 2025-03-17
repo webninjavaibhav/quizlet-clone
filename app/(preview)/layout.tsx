@@ -7,7 +7,7 @@ import { Geist } from "next/font/google";
 const geist = Geist({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://ai-sdk-preview-pdf-support.vercel.app"),
+  metadataBase: new URL("https://quizlet-clone-gamma.vercel.app/"),
   title: "Study Smarter - PDF to Quiz & Flashcard Generator",
   description: "Generate study materials and flashcards from your PDF documents. Take quizzes to test your knowledge and track your progress.",
 };
