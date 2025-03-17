@@ -25,6 +25,7 @@ import { generateQuizTitle } from "./actions";
 import { AnimatePresence, motion } from "framer-motion";
 import { Header } from "@/components/ui/header";
 import { capitalizeFirst } from "@/lib/utils";
+import { AnimatedBackground } from "@/components/ui/animated-background";
 
 // Define available study modes
 type StudyMode = "quiz" | "flashcards" | "matching";
@@ -265,23 +266,9 @@ export default function ChatWithFiles() {
 
   // Render file upload interface
   return (
-    <div
-      className="min-h-[100dvh] w-full flex justify-center items-center"
-      onDragOver={(e) => {
-        e.preventDefault();
-        setIsDragging(true);
-      }}
-      onDragExit={() => setIsDragging(false)}
-      onDragEnd={() => setIsDragging(false)}
-      onDragLeave={() => setIsDragging(false)}
-      onDrop={(e) => {
-        e.preventDefault();
-        setIsDragging(false);
-        handleFileChange({
-          target: { files: e.dataTransfer.files },
-        } as React.ChangeEvent<HTMLInputElement>);
-      }}
-    >
+    <div className="min-h-[100dvh] w-full flex justify-center items-center relative overflow-hidden">
+      <AnimatedBackground />
+
       <AnimatePresence>
         {isDragging && (
           <motion.div
@@ -297,9 +284,14 @@ export default function ChatWithFiles() {
           </motion.div>
         )}
       </AnimatePresence>
-      <Card className="w-full max-w-md border-0 sm:border">
+      
+      <Card className="w-full max-w-md border-0 sm:border backdrop-blur-xl bg-white/80 dark:bg-zinc-900/80">
         <CardHeader className="text-center space-y-6">
-          <div className="mx-auto flex items-center justify-center space-x-2 text-muted-foreground">
+          <motion.div 
+            className="mx-auto flex items-center justify-center space-x-2 text-muted-foreground"
+            animate={{ scale: [1, 1.1, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
             <div className="rounded-full bg-primary/10 p-2">
               <FileUp className="h-6 w-6" />
             </div>
@@ -307,19 +299,21 @@ export default function ChatWithFiles() {
             <div className="rounded-full bg-primary/10 p-2">
               <Brain className="h-6 w-6" />
             </div>
-          </div>
+          </motion.div>
           <div className="space-y-2">
             <CardTitle className="text-2xl font-bold">
-              PDF Study Material Generator
+              Smart Document Editor
             </CardTitle>
             <CardDescription className="text-base">
+              Transform your PDFs into interactive learning materials
             </CardDescription>
           </div>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmitWithFiles} className="space-y-4">
-            <div
-              className={`relative flex flex-col items-center justify-center border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 transition-colors hover:border-muted-foreground/50 min-h-[200px]`}
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              className={`relative flex flex-col items-center justify-center border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 transition-colors hover:border-muted-foreground/50 min-h-[200px] backdrop-blur-sm`}
             >
               <input
                 type="file"
@@ -337,7 +331,7 @@ export default function ChatWithFiles() {
                   <span>Drop your PDF here or click to browse.</span>
                 )}
               </p>
-            </div>
+            </motion.div>
 
             <div className="grid grid-cols-3 gap-2">
               <Button

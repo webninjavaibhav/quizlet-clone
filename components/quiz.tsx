@@ -16,6 +16,7 @@ import {
 import QuizScore from "./score";
 import QuizReview from "./quiz-overview";
 import { Question } from "@/lib/schemas";
+import { AnimatedBackground } from "./ui/animated-background";
 
 // Props type definition for Quiz component
 type QuizProps = {
@@ -48,7 +49,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
   const answerLabels = ["A", "B", "C", "D"];
 
   return (
-    <Card className="w-full">
+    <Card className="w-full backdrop-blur-xl bg-background/60 border">
       <CardHeader>
         <div className="flex justify-between items-center mb-4">
           <span className="text-sm font-medium text-muted-foreground">Term</span>
@@ -65,14 +66,14 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
           <Button
             key={index}
             variant={selectedAnswer === answerLabels[index] ? "secondary" : "outline"}
-            className={`w-full h-auto py-6 px-4 justify-start text-left whitespace-normal ${
+            className={`w-full h-auto py-6 px-4 justify-start text-left whitespace-normal backdrop-blur-xl ${
               showCorrectAnswer && answerLabels[index] === question.answer
-                ? "bg-green-600 hover:bg-green-700 text-white"
+                ? "bg-green-600/80 hover:bg-green-700/90 text-white"
                 : showCorrectAnswer &&
                   selectedAnswer === answerLabels[index] &&
                   selectedAnswer !== question.answer
-                  ? "bg-red-600 hover:bg-red-700 text-white"
-                  : ""
+                  ? "bg-red-600/80 hover:bg-red-700/90 text-white"
+                  : "bg-background/60"
             }`}
             onClick={() => onSelectAnswer(answerLabels[index])}
           >
@@ -131,16 +132,21 @@ export default function Quiz({
     setAnswers(newAnswers);
     onAnswerSelect(newAnswers);
 
-    // Auto-scroll to next question
-    if (index < questions.length - 1) {
-      const nextQuestion = questionRefs.current[index + 1];
-      if (nextQuestion) {
-        const elementPosition = nextQuestion.getBoundingClientRect().top;
-        const offsetPosition = elementPosition + window.pageYOffset - headerHeight;
-        window.scrollTo({
-          top: offsetPosition,
-          behavior: 'smooth'
-        });
+    // Update current question index
+    setCurrentQuestionIndex(index);
+
+    // Only auto-scroll in quiz mode
+    if (title.toLowerCase().includes("quiz")) {
+      if (index < questions.length - 1) {
+        const nextQuestion = questionRefs.current[index + 1];
+        if (nextQuestion) {
+          const elementPosition = nextQuestion.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - headerHeight;
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          });
+        }
       }
     }
   };
@@ -170,14 +176,15 @@ export default function Quiz({
   const allQuestionsAnswered = answers.every(answer => answer !== null);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <main className="container mx-auto px-4 py-12 max-w-4xl">
-        <h1 className="text-3xl font-bold mb-8 text-center text-foreground">
+    <div className="min-h-[calc(100vh-5rem)] relative">
+      <AnimatedBackground />
+      <main className="container mx-auto px-4 py-8 max-w-4xl relative">
+        <h1 className="text-3xl font-bold mb-8 text-center">
           {title}
         </h1>
-        <div className="relative">
+        <div className="relative space-y-8">
           {!isSubmitted && <Progress value={progress} className="h-1 mb-8" />}
-          <div className="space-y-12">
+          <div className="space-y-8">
             {!isSubmitted ? (
               <>
                 {questions.map((question, index) => (
@@ -198,7 +205,7 @@ export default function Quiz({
                   </div>
                 ))}
                 {allQuestionsAnswered && (
-                  <div className="fixed bottom-0 left-0 right-0 bg-background p-4 border-t shadow-lg">
+                  <div className="fixed bottom-0 left-0 right-0 bg-background/60 backdrop-blur-xl p-4 border-t">
                     <div className="container mx-auto max-w-4xl">
                       <Button onClick={handleSubmit} className="w-full">
                         Submit Quiz
@@ -213,21 +220,21 @@ export default function Quiz({
                   correctAnswers={score ?? 0}
                   totalQuestions={questions.length}
                 />
-                <div className="space-y-12">
+                <div className="space-y-8">
                   <QuizReview questions={questions} userAnswers={answers} />
                 </div>
-                <div className="fixed bottom-0 left-0 right-0 bg-background p-4 border-t shadow-lg">
+                <div className="fixed bottom-0 left-0 right-0 bg-background/60 backdrop-blur-xl p-4 border-t">
                   <div className="container mx-auto max-w-4xl flex justify-center space-x-4">
                     <Button
                       onClick={handleReset}
                       variant="outline"
-                      className="bg-muted hover:bg-muted/80 w-full"
+                      className="backdrop-blur-xl bg-background/60 w-full"
                     >
                       <RefreshCw className="mr-2 h-4 w-4" /> Reset Quiz
                     </Button>
                     <Button
                       onClick={clearPDF}
-                      className="bg-primary hover:bg-primary/90 w-full"
+                      className="backdrop-blur-xl bg-primary/80 hover:bg-primary/90 w-full"
                     >
                       <FileText className="mr-2 h-4 w-4" /> Try Another PDF
                     </Button>

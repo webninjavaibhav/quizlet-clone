@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, RotateCw } from "lucide-react";
 import { Button } from "./ui/button";
 import type { Flashcard } from "@/lib/flashcardSchema";
+import { AnimatedBackground } from "@/components/ui/animated-background";
 
 interface FlashcardsProps {
   title: string;
@@ -97,88 +98,97 @@ export default function Flashcards({ title, flashcards, clearPDF }: FlashcardsPr
   };
 
   return (
-    <div className="container max-w-4xl mx-auto px-4 py-8">
-      {/* Header section */}
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold mb-2">{title}</h1>
-        <p className="text-muted-foreground">
-          Card {currentIndex + 1} of {flashcards.length}
-        </p>
-      </div>
+    <div className="min-h-[calc(100vh-5rem)] relative">
+      <AnimatedBackground />
+      <div className="container max-w-4xl mx-auto px-4 py-8 relative">
+        {/* Header section */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold mb-2">{title}</h1>
+          <p className="text-muted-foreground">
+            Card {currentIndex + 1} of {flashcards.length}
+          </p>
+        </div>
 
-      {/* Navigation buttons */}
-      <div className="flex items-center justify-center gap-4 mb-8">
-        <Button
-          variant="outline"
-          onClick={goToPrevious}
-          disabled={currentIndex === 0}
-        >
-          <ChevronLeft className="h-4 w-4 mr-2" />
-          Previous
-        </Button>
-        <Button
-          variant="outline"
-          onClick={goToNext}
-          disabled={currentIndex === flashcards.length - 1}
-        >
-          Next
-          <ChevronRight className="h-4 w-4 ml-2" />
-        </Button>
-      </div>
-
-      {/* Flashcard container with 3D flip animation */}
-      <div className="flex justify-center">
-        <motion.div
-          className="w-full max-w-2xl aspect-[3/2] perspective-1000"
-          onClick={handleFlip}
-        >
-          <motion.div
-            className="w-full h-full relative transform-style-3d cursor-pointer"
-            animate={{ rotateY: isFlipped ? -180 : 0 }}
-            transition={{ duration: 0.6 }}
+        {/* Navigation buttons */}
+        <div className="flex items-center justify-center gap-4 mb-8">
+          <Button
+            variant="outline"
+            onClick={goToPrevious}
+            disabled={currentIndex === 0}
+            className="backdrop-blur-xl bg-background/60"
           >
-            {/* Front of card */}
-            <motion.div
-              className={`absolute w-full h-full backface-hidden rounded-xl border p-8 flex flex-col items-center justify-center text-center bg-card ${
-                isFlipped ? "hidden" : ""
-              }`}
-            >
-              <div className="text-sm text-muted-foreground mb-4">
-                {currentCard.category}
-              </div>
-              {renderCardContent()}
-              <div className="absolute bottom-4 left-0 right-0 flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                <RotateCw className="h-4 w-4 animate-[spin_3s_linear_infinite]" />
-                <span>Click card to see {currentCard.type === "qa" ? "answer" : "answers"}</span>
-              </div>
-            </motion.div>
+            <ChevronLeft className="h-4 w-4 mr-2" />
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            onClick={goToNext}
+            disabled={currentIndex === flashcards.length - 1}
+            className="backdrop-blur-xl bg-background/60"
+          >
+            Next
+            <ChevronRight className="h-4 w-4 ml-2" />
+          </Button>
+        </div>
 
-            {/* Back of card */}
+        {/* Flashcard container with 3D flip animation */}
+        <div className="flex justify-center">
+          <motion.div
+            className="w-full max-w-2xl aspect-[3/2] perspective-1000"
+            onClick={handleFlip}
+          >
             <motion.div
-             animate={{ rotateY: isFlipped ? -180 : 0 }}
-             transition={{ duration: 0}}
-              className={`absolute w-full h-full backface-hidden rounded-xl border p-8 flex flex-col items-center justify-center text-center rotate-y-180 bg-card ${
-                !isFlipped ? "hidden" : ""
-              }`}
+              className="w-full h-full relative transform-style-3d cursor-pointer"
+              animate={{ rotateY: isFlipped ? -180 : 0 }}
+              transition={{ duration: 0.6 }}
             >
-              <div className="text-sm text-muted-foreground mb-4">
-                {currentCard.category}
-              </div>
-              {renderCardContent()}
-              <div className="absolute bottom-4 left-0 right-0 flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                <RotateCw className="h-4 w-4 animate-[spin_3s_linear_infinite]" />
-                <span>Click to flip back</span>
-              </div>
+              {/* Front of card */}
+              <motion.div
+                className={`absolute w-full h-full backface-hidden rounded-xl border p-8 flex flex-col items-center justify-center text-center backdrop-blur-xl bg-background/60 ${
+                  isFlipped ? "hidden" : ""
+                }`}
+              >
+                <div className="text-sm text-muted-foreground mb-4">
+                  {currentCard.category}
+                </div>
+                {renderCardContent()}
+                <div className="absolute bottom-4 left-0 right-0 flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                  <RotateCw className="h-4 w-4 animate-[spin_3s_linear_infinite]" />
+                  <span>Click card to see {currentCard.type === "qa" ? "answer" : "answers"}</span>
+                </div>
+              </motion.div>
+
+              {/* Back of card */}
+              <motion.div
+                animate={{ rotateY: isFlipped ? -180 : 0 }}
+                transition={{ duration: 0 }}
+                className={`absolute w-full h-full backface-hidden rounded-xl border p-8 flex flex-col items-center justify-center text-center rotate-y-180 backdrop-blur-xl bg-background/60 ${
+                  !isFlipped ? "hidden" : ""
+                }`}
+              >
+                <div className="text-sm text-muted-foreground mb-4">
+                  {currentCard.category}
+                </div>
+                {renderCardContent()}
+                <div className="absolute bottom-4 left-0 right-0 flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                  <RotateCw className="h-4 w-4 animate-[spin_3s_linear_infinite]" />
+                  <span>Click to flip back</span>
+                </div>
+              </motion.div>
             </motion.div>
           </motion.div>
-        </motion.div>
-      </div>
+        </div>
 
-      {/* Reset button */}
-      <div className="flex justify-center mt-8">
-        <Button variant="outline" onClick={clearPDF}>
-          Try another PDF
-        </Button>
+        {/* Reset button */}
+        <div className="flex justify-center mt-8">
+          <Button 
+            variant="outline" 
+            onClick={clearPDF}
+            className="backdrop-blur-xl bg-background/60"
+          >
+            Try another PDF
+          </Button>
+        </div>
       </div>
     </div>
   );

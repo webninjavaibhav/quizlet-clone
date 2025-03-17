@@ -4,6 +4,7 @@ import { MatchPair } from "@/lib/matchCardSchema";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { AnimatedBackground } from "@/components/ui/animated-background";
 
 // Props interface for the MatchCards component
 interface MatchCardsProps {
@@ -133,57 +134,60 @@ export default function MatchCards({ title, matchCards, clearPDF, onGameComplete
     selectedCards.some(selected => selected.id === card.id);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold mb-2">{title}</h1>
-        <p className="text-muted-foreground">
-          Match questions with their correct answers. 
-          Matched pairs: {matchedPairs} / {matchCards.length}
-        </p>
-      </div>
+    <div className="min-h-screen relative">
+      <AnimatedBackground />
+      <div className="container mx-auto px-4 py-8 relative">
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-bold mb-2">{title}</h1>
+          <p className="text-muted-foreground">
+            Match questions with their correct answers. 
+            Matched pairs: {matchedPairs} / {matchCards.length}
+          </p>
+        </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        {cards.map(card => (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          {cards.map(card => (
+            <motion.div
+              key={card.id}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ 
+                opacity: card.isMatched ? 0 : 1,
+                scale: card.isMatched ? 0.8 : 1
+              }}
+              whileHover={{ scale: card.isMatched ? 1 : 1.05 }}
+              onClick={() => !card.isMatched && handleCardClick(card)}
+              className={cn(
+                "cursor-pointer p-4 rounded-lg min-h-[120px] md:min-h-[150px] lg:min-h-[180px] flex items-center justify-center text-center",
+                "border-2 transition-colors duration-200",
+                card.type === "question" ? "bg-primary/10" : "bg-secondary/10",
+                isSelected(card) && "border-primary",
+                !isSelected(card) && "hover:border-primary/50",
+                card.isMatched && "invisible"
+              )}
+            >
+              {!card.isMatched && (
+                <p className="text-xs md:text-sm lg:text-base">{card.content}</p>
+              )}
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Victory modal */}
+        {matchedPairs === matchCards.length && (
           <motion.div
-            key={card.id}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ 
-              opacity: card.isMatched ? 0 : 1,
-              scale: card.isMatched ? 0.8 : 1
-            }}
-            whileHover={{ scale: card.isMatched ? 1 : 1.05 }}
-            onClick={() => !card.isMatched && handleCardClick(card)}
-            className={cn(
-              "cursor-pointer p-4 rounded-lg min-h-[120px] md:min-h-[150px] lg:min-h-[180px] flex items-center justify-center text-center",
-              "border-2 transition-colors duration-200",
-              card.type === "question" ? "bg-primary/10" : "bg-secondary/10",
-              isSelected(card) && "border-primary",
-              !isSelected(card) && "hover:border-primary/50",
-              card.isMatched && "invisible"
-            )}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="fixed inset-0 flex items-center justify-center bg-black/50"
           >
-            {!card.isMatched && (
-              <p className="text-xs md:text-sm lg:text-base">{card.content}</p>
-            )}
+            <div className="bg-background p-8 rounded-lg text-center backdrop-blur-xl bg-white/80 dark:bg-zinc-900/80">
+              <h2 className="text-2xl font-bold mb-4">🎉 Congratulations! 🎉</h2>
+              <p className="mb-2">You&apos;ve matched all the pairs correctly!</p>
+              <p className="text-lg font-mono mb-4">Time: {formatTime(elapsedMs)}</p>
+              <Button onClick={clearPDF}>Try another PDF</Button>
+            </div>
           </motion.div>
-        ))}
+        )}
       </div>
-
-      {/* Victory modal */}
-      {matchedPairs === matchCards.length && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="fixed inset-0 flex items-center justify-center bg-black/50"
-        >
-          <div className="bg-background p-8 rounded-lg text-center">
-            <h2 className="text-2xl font-bold mb-4">🎉 Congratulations! 🎉</h2>
-            <p className="mb-2">You&apos;ve matched all the pairs correctly!</p>
-            <p className="text-lg font-mono mb-4">Time: {formatTime(elapsedMs)}</p>
-            <Button onClick={clearPDF}>Try another PDF</Button>
-          </div>
-        </motion.div>
-      )}
     </div>
   );
 }

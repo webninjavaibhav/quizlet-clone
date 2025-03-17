@@ -7,6 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "./dropdown-menu";
 import { useState, useEffect } from "react";
+import { AnimatedBackground } from "./animated-background";
 
 // Available study modes
 type StudyMode = "quiz" | "flashcards" | "matching";
@@ -71,70 +72,73 @@ export function Header({
   };
 
   return (
-    <div className="sticky top-0 z-50 flex items-center justify-between mb-6 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 p-4 rounded-lg border-b">
-      {/* Mode selector dropdown */}
-      <div className="flex-1 flex items-center gap-4">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="h-10 px-6 text-base">
-              {mode.charAt(0).toUpperCase() + mode.slice(1)}
-              <ChevronDown className="ml-2 h-5 w-5" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-48">
-            <DropdownMenuItem 
-              onClick={() => handleModeChange("quiz")} 
-              className={`py-2 ${mode === "quiz" ? "bg-accent" : ""}`}
-            >
-              <BookOpen className="mr-2 h-5 w-5" />
-              Quiz
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              onClick={() => handleModeChange("flashcards")} 
-              className={`py-2 ${mode === "flashcards" ? "bg-accent" : ""}`}
-            >
-              <ListChecks className="mr-2 h-5 w-5" />
-              Flashcards
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              onClick={() => handleModeChange("matching")} 
-              className={`py-2 ${mode === "matching" ? "bg-accent" : ""}`}
-            >
-              <Brain className="mr-2 h-5 w-5" />
-              Matching
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+    <div className="sticky top-0 z-50 h-20">
+      <AnimatedBackground />
+      <div className="relative h-full flex items-center justify-between px-4 backdrop-blur-xl bg-background/60">
+        {/* Mode selector dropdown */}
+        <div className="flex-1 flex items-center gap-4">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="h-10 px-6 text-base backdrop-blur-xl bg-background/60">
+                {mode.charAt(0).toUpperCase() + mode.slice(1)}
+                <ChevronDown className="ml-2 h-5 w-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-48">
+              <DropdownMenuItem 
+                onClick={() => handleModeChange("quiz")} 
+                className={`py-2 ${mode === "quiz" ? "bg-accent" : ""}`}
+              >
+                <BookOpen className="mr-2 h-5 w-5" />
+                Quiz
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => handleModeChange("flashcards")} 
+                className={`py-2 ${mode === "flashcards" ? "bg-accent" : ""}`}
+              >
+                <ListChecks className="mr-2 h-5 w-5" />
+                Flashcards
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => handleModeChange("matching")} 
+                className={`py-2 ${mode === "matching" ? "bg-accent" : ""}`}
+              >
+                <Brain className="mr-2 h-5 w-5" />
+                Matching
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
 
-      {/* Mode-specific status display */}
-      <div className="text-base md:text-lg font-semibold flex-1 text-center flex items-center justify-center gap-4 text-primary/90">
-        {mode === "quiz" && (
-          <span className="bg-primary/5 px-4 py-2 rounded-lg">
-            Questions Answered: {answeredCount}/{questionCount}
-          </span>
-        )}
-        {mode === "flashcards" && (
-          <span className="bg-primary/5 px-4 py-2 rounded-lg">
-            Flashcards Quiz
-          </span>
-        )}
-        {mode === "matching" && (
-          <div className="bg-primary/5 px-4 py-2 rounded-lg flex items-center gap-3">
-            <span>Match Quiz</span>
-            <div className="flex items-center border-l pl-3 border-primary/20">
-              <Timer className="h-4 w-4 mr-1" />
-              <span className="font-mono">{formatTime(elapsedMs)}</span>
+        {/* Mode-specific status display */}
+        <div className="text-base md:text-lg font-semibold flex-1 text-center flex items-center justify-center gap-4 text-primary/90">
+          {mode === "quiz" && (
+            <span className="backdrop-blur-xl bg-background/60 px-4 py-2 rounded-lg border">
+              Questions Answered: {answeredCount}/{questionCount}
+            </span>
+          )}
+          {mode === "flashcards" && (
+            <span className="backdrop-blur-xl bg-background/60 px-4 py-2 rounded-lg border">
+              Flashcards Quiz
+            </span>
+          )}
+          {mode === "matching" && (
+            <div className="backdrop-blur-xl bg-background/60 px-4 py-2 rounded-lg border flex items-center gap-3">
+              <span>Match Quiz</span>
+              <div className="flex items-center border-l pl-3 border-primary/20">
+                <Timer className="h-4 w-4 mr-1" />
+                <span className="font-mono">{formatTime(elapsedMs)}</span>
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
 
-      {/* Reset button */}
-      <div className="flex-1 flex justify-end">
-        <Button variant="ghost" onClick={onReset}>
-          <Home className="h-4 w-4" />
-        </Button>
+        {/* Reset button */}
+        <div className="flex-1 flex justify-end">
+          <Button variant="ghost" onClick={onReset} className="backdrop-blur-xl bg-background/60">
+            <Home className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
     </div>
   );
