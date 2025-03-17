@@ -7,6 +7,12 @@ import {
   RefreshCw,
   FileText,
 } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import QuizScore from "./score";
 import QuizReview from "./quiz-overview";
 import { Question } from "@/lib/schemas";
@@ -26,6 +32,8 @@ type QuestionCardProps = {
   onSelectAnswer: (answer: string) => void;
   isSubmitted: boolean;
   showCorrectAnswer: boolean;
+  questionNumber: number;
+  totalQuestions: number;
 };
 
 // QuestionCard component for rendering individual quiz questions
@@ -33,27 +41,37 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
   question, 
   selectedAnswer, 
   onSelectAnswer, 
-  showCorrectAnswer 
+  showCorrectAnswer,
+  questionNumber,
+  totalQuestions
 }) => {
   const answerLabels = ["A", "B", "C", "D"];
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-lg font-semibold leading-tight">
-        {question.question}
-      </h2>
-      <div className="grid grid-cols-1 gap-4">
+    <Card className="w-full">
+      <CardHeader>
+        <div className="flex justify-between items-center mb-4">
+          <span className="text-sm font-medium text-muted-foreground">Term</span>
+          <span className="text-sm text-muted-foreground">
+            {questionNumber} of {totalQuestions}
+          </span>
+        </div>
+        <CardTitle className="text-lg font-semibold leading-tight">
+          {question.question}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
         {question.options.map((option, index) => (
           <Button
             key={index}
             variant={selectedAnswer === answerLabels[index] ? "secondary" : "outline"}
-            className={`h-auto py-6 px-4 justify-start text-left whitespace-normal ${
+            className={`w-full h-auto py-6 px-4 justify-start text-left whitespace-normal ${
               showCorrectAnswer && answerLabels[index] === question.answer
-                ? "bg-green-600 hover:bg-green-700"
+                ? "bg-green-600 hover:bg-green-700 text-white"
                 : showCorrectAnswer &&
                   selectedAnswer === answerLabels[index] &&
                   selectedAnswer !== question.answer
-                  ? "bg-red-600 hover:bg-red-700"
+                  ? "bg-red-600 hover:bg-red-700 text-white"
                   : ""
             }`}
             onClick={() => onSelectAnswer(answerLabels[index])}
@@ -73,8 +91,8 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
               )}
           </Button>
         ))}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 
@@ -174,6 +192,8 @@ export default function Quiz({
                       onSelectAnswer={(answer) => handleSelectAnswer(answer, index)}
                       isSubmitted={isSubmitted}
                       showCorrectAnswer={false}
+                      questionNumber={index + 1}
+                      totalQuestions={questions.length}
                     />
                   </div>
                 ))}
