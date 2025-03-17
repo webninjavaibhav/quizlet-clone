@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/generate-matchcards": {
+      "maxDuration": 60
+    }
+  }
+} 
