@@ -24,6 +24,7 @@ import MatchCards from "@/components/MatchCards";
 import { generateQuizTitle } from "./actions";
 import { AnimatePresence, motion } from "framer-motion";
 import { Header } from "@/components/ui/header";
+import { capitalizeFirst } from "@/lib/utils";
 
 // Define available study modes
 type StudyMode = "quiz" | "flashcards" | "matching";
@@ -148,6 +149,7 @@ export default function ChatWithFiles() {
   // Mode change handler
   const handleModeChange = async (newMode: StudyMode) => {
     setStudyMode(newMode);
+    setFiles([]); // Reset files to show main upload interface
   };
 
   // Form submission handler
@@ -223,6 +225,8 @@ export default function ChatWithFiles() {
     (studyMode === "flashcards" && flashcards.length === 8 && !isLoadingFlashcards) ||
     (studyMode === "matching" && matchCards.length === 6 && !isLoadingMatchCards)
   );
+
+  console.log("hasContent",flashcards);
 
   // Render content based on state
   if (hasContent) {
@@ -374,10 +378,10 @@ export default function ChatWithFiles() {
               {isLoading ? (
                 <span className="flex items-center space-x-2">
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>Generating all study materials...</span>
+                  <span>Generating {capitalizeFirst(studyMode)} materials...</span>
                 </span>
               ) : (
-                "Generate all study materials"
+                `Generate ${capitalizeFirst(studyMode)} materials`
               )}
             </Button>
           </form>

@@ -155,6 +155,8 @@ export default function Flashcards({ title, flashcards, clearPDF }: FlashcardsPr
 
             {/* Back of card */}
             <motion.div
+             animate={{ rotateY: isFlipped ? -180 : 0 }}
+             transition={{ duration: 0}}
               className={`absolute w-full h-full backface-hidden rounded-xl border p-8 flex flex-col items-center justify-center text-center rotate-y-180 bg-card ${
                 !isFlipped ? "hidden" : ""
               }`}
