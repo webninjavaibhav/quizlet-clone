@@ -149,7 +149,6 @@ export default function ChatWithFiles() {
   // Mode change handler
   const handleModeChange = async (newMode: StudyMode) => {
     setStudyMode(newMode);
-    setFiles([]); // Reset files to show main upload interface
   };
 
   // Form submission handler
